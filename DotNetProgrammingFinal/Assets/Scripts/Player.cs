@@ -5,36 +5,48 @@ using UnityEngine.UI;
 public class Player : MovingObject
 {
     public float restartLevelDelay = 1f;
+    public int pointsPerFood = 10;
+    public int pointsPerSoda = 20;
     public int wallDamage = 1;
+    public Text foodText;
     public AudioClip moveSound1;
     public AudioClip moveSound2;
+    public AudioClip eatSound1;
+    public AudioClip eatSound2;
+    public AudioClip drinkSound1;
+    public AudioClip drinkSound2;
     public AudioClip gameOverSound;
 
     private Animator animator;
+    private int food;
 
     protected override void Start()
     {
         animator = GetComponent<Animator>();
+        food = GameManager.instance.playerFoodPoints;
+        //foodText.text = "Food: " + food;
         base.Start();
     }
 
     private void OnDisable()
     {
-        
+        GameManager.instance.playerFoodPoints = food;
     }
 
     private void Update()
     {
+        if (!GameManager.instance.playersTurn)
+            return;
         int horizontal = 0;
         int vertical = 0;
-        #if UNITY_STANDALONE || UNITY_WEBPLAYER
+#if UNITY_STANDALONE || UNITY_WEBPLAYER
         horizontal = (int)(Input.GetAxisRaw("Horizontal"));
         vertical = (int)(Input.GetAxisRaw("Vertical"));
         if (horizontal != 0)
         {
             vertical = 0;
         }
-        #endif
+#endif
         if (horizontal != 0 || vertical != 0)
         {
             AttemptMove<Wall>(horizontal, vertical);
@@ -43,6 +55,8 @@ public class Player : MovingObject
 
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
+        //food--;
+        //foodText.text = "Food: " + food;
         base.AttemptMove<T>(xDir, yDir);
         RaycastHit2D hit;
         if (Move(xDir, yDir, out hit))
@@ -50,6 +64,7 @@ public class Player : MovingObject
             //	SoundManager.instance.RandomizeSfx (moveSound1, moveSound2);
         }
         CheckIfGameOver();
+        GameManager.instance.playersTurn = false;
     }
 
     protected override void OnCantMove<T>(T component)
@@ -63,11 +78,22 @@ public class Player : MovingObject
     {
         if (other.tag == "Exit")
         {
-            //TODO Pull up Random Question here and check answer and stuff...
-
-            //IF ANSWER CORRECT DO BELOW
             Invoke("Restart", restartLevelDelay);
             enabled = false;
+        }
+        else if (other.tag == "Food")
+        {
+            food += pointsPerFood;
+            foodText.text = "+" + pointsPerFood + " Food: " + food;
+            //	SoundManager.instance.RandomizeSfx (eatSound1, eatSound2);
+            other.gameObject.SetActive(false);
+        }
+        else if (other.tag == "Soda")
+        {
+            food += pointsPerSoda;
+            foodText.text = "+" + pointsPerSoda + " Food: " + food;
+            //		SoundManager.instance.RandomizeSfx (drinkSound1, drinkSound2);
+            other.gameObject.SetActive(false);
         }
     }
 
@@ -77,11 +103,19 @@ public class Player : MovingObject
     }
 
 
+    public void LoseFood(int loss)
+    {
+        animator.SetTrigger("playerHit");
+        food -= loss;
+        foodText.text = "-" + loss + " Food: " + food;
+        CheckIfGameOver();
+    }
+
     private void CheckIfGameOver()
     {
         //Check if food point total is less than or equal to zero.
-        //if (food <= 0)
-        //{
+        if (food <= 0)
+        {
             //Call the PlaySingle function of SoundManager and pass it the gameOverSound as the audio clip to play.
             //		SoundManager.instance.PlaySingle (gameOverSound);
 
@@ -89,7 +123,7 @@ public class Player : MovingObject
             //	SoundManager.instance.musicSource.Stop();
 
             //Call the GameOver function of GameManager.
-        //    GameManager.instance.GameOver();
-        //}
+            GameManager.instance.GameOver();
+        }
     }
 }

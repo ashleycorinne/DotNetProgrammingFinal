@@ -8,6 +8,10 @@ public class TriviaQA {
 
 	public List<TriviaQuestion> TriviaQuestions { get; set; }
 
+    public TriviaQA()
+    {
+        TriviaQuestions = new List<TriviaQuestion>();
+    }
     public bool IsCorrectAnswer(int id, char guess)
     {
         TriviaQuestion q = TriviaQuestions.Where(x => x.Id == id).FirstOrDefault();
@@ -22,8 +26,7 @@ public class TriviaQA {
         if (TriviaQuestions.Count > 0)
         {
             q = TriviaQuestions[0];
-            TriviaQuestions.RemoveAt(0);
-            return TriviaQuestions[0];
+            TriviaQuestions = TriviaQuestions.Where(x => x.Id != q.Id).ToList();
         }
         return q;
     }
@@ -42,14 +45,16 @@ public class TriviaQA {
 
 				using (SqliteDataReader reader = command.ExecuteReader ()) {
 					while (reader.Read ()) {
-						Debug.Log ("ID: " + reader ["ID"]);
-						Debug.Log ("First Question: " + reader ["QUESTION"]);
-						Debug.Log ("First Answer: " + reader ["ANS_A"]);
-						Debug.Log ("Second Answer: " + reader ["ANS_B"]);
-						Debug.Log ("Third Answer: " + reader ["ANS_C"]);
-						Debug.Log ("Fourth Answer: " + reader ["ANS_D"]);
-						Debug.Log ("Actual Answer: " + reader ["ANSWER"]);
-					}
+                        TriviaQuestion q = new TriviaQuestion();
+                        q.Id = int.Parse(reader["ID"].ToString());
+                        q.Question = reader["QUESTION"].ToString();
+                        q.Answer = char.Parse(reader["ANSWER"].ToString());
+                        q.AnswerA = reader["ANS_A"].ToString();
+                        q.AnswerB = reader["ANS_B"].ToString();
+                        q.AnswerC = reader["ANS_C"].ToString();
+                        q.AnswerD = reader["ANS_D"].ToString();
+                        TriviaQuestions.Add(q);
+                    }
 
 					reader.Close ();
 				}

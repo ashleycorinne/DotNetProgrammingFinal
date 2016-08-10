@@ -15,3 +15,5 @@
 /Users/jnaputi253/Desktop/DotNetProgrammingFinal/DotNetProgrammingFinal/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/jnaputi253/Desktop/DotNetProgrammingFinal/DotNetProgrammingFinal/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /Users/jnaputi253/Desktop/DotNetProgrammingFinal/DotNetProgrammingFinal/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/jnaputi253/Desktop/DotNetProgrammingFinal/DotNetProgrammingFinal/Temp/bin/Debug/Mono.Data.Sqlite.dll
+/Users/jnaputi253/Desktop/DotNetProgrammingFinal/DotNetProgrammingFinal/Temp/bin/Debug/System.Data.dll
